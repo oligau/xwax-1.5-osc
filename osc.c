@@ -104,7 +104,7 @@ int osc_send_ppm_block(struct track *tr)
                 lo_blob blob = lo_blob_new(j, &ppm_block);
 
                 //lo_server server = lo_server_thread_get_server(st_tcp);
-                if (lo_send(address[c], "/touchwax/ppm", "ibi", 
+                if (lo_send(address[c], "/xwax/ppm", "ibi", 
                     (int) tr, 
                     blob,
                     tr->length
@@ -114,7 +114,7 @@ int osc_send_ppm_block(struct track *tr)
                 }
                 lo_blob_free(blob);
             }
-            lo_send(address[c], "/touchwax/ppm_end", "i", (int) tr);
+            lo_send(address[c], "/xwax/ppm_end", "i", (int) tr);
             
             printf("Sent %p blocks to %s\n", tr, lo_address_get_url(address[c]));
             sleep(1); // Wierd bug in liblo that makes second track load not catched by client's track_load_handler if sent too fast
@@ -129,11 +129,11 @@ int osc_send_pos(int d, const float pos, const float pitch)
     //lo_address t = lo_address_new(NULL, "7771");
     //lo_address t = lo_address_new(address, "7771");
 
-    /* send a message to /touchwax/position with one float argument, report any
+    /* send a message to /xwax/position with one float argument, report any
      * errors */
     int c;
     for(c = 0; c < osc_nclient%3; ++c) {
-        if (lo_send(address[c], "/touchwax/position", "iff", d, pos, pitch) == -1) {
+        if (lo_send(address[c], "/xwax/position", "iff", d, pos, pitch) == -1) {
             printf("OSC error %d: %s\n", lo_address_errno(address[c]),
                    lo_address_errstr(address[c]));
         }
@@ -150,11 +150,11 @@ int osc_send_track_load(struct deck *de)
     tr = pl->track;
     
     if(tr) {
-        /* send a message to /touchwax/track_load with two arguments, report any
+        /* send a message to /xwax/track_load with two arguments, report any
          * errors */
         int c;
         for(c = 0; c < osc_nclient%3; ++c) { 
-            if (lo_send(address[c], "/touchwax/track_load", "iissi",
+            if (lo_send(address[c], "/xwax/track_load", "iissi",
                     de->ncontrol,
                     (int) tr,
                     de->record->artist, 
@@ -175,11 +175,11 @@ int osc_send_track_load(struct deck *de)
 
 int osc_send_scale(int scale)
 {
-    /* send a message to /touchwax/track_load with two arguments, report any
+    /* send a message to /xwax/track_load with two arguments, report any
      * errors */
     int c;
     for(c = 0; c < osc_nclient%3; ++c) {
-        if (lo_send(address[c], "/touchwax/scale", "i", scale) == -1) {
+        if (lo_send(address[c], "/xwax/scale", "i", scale) == -1) {
             printf("OSC error %d: %s\n", lo_address_errno(address[c]),
                    lo_address_errstr(address[c]));
         }
