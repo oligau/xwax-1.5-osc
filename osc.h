@@ -30,26 +30,29 @@
 #include <lo/lo.h>
 
 #include "list.h"
+#include "library.h"
 #include "deck.h"
 
 void error(int num, const char *m, const char *path);
 
 int generic_handler(const char *path, const char *types, lo_arg ** argv,
                     int argc, void *data, void *user_data);
-
+int load_track_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data);                      
+int set_cue_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data);       
+int punch_cue_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data);    
 int pitch_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
-
 int connect_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);                
-
 int position_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);  
-                
 int quit_handler(const char *path, const char *types, lo_arg ** argv,
                  int argc, void *data, void *user_data);
 
-int osc_start(struct deck *deck);
+int osc_start(struct deck *deck, struct library *library);
 void osc_stop();
 void osc_add_deck();
 

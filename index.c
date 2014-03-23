@@ -87,6 +87,10 @@ static int enlarge(struct index *ls, size_t target)
 
     p = target + BLOCK - 1; /* pre-allocate additional entries */
 
+    assert(p != NULL);
+    
+    fprintf(stderr, "enlarge: ls->record: %p\n", ls->record);
+    
     ln = realloc(ls->record, sizeof(struct record*) * p);
     if (ln == NULL) {
         perror("realloc");

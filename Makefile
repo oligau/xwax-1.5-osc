@@ -40,7 +40,7 @@ DOCDIR ?= $(PREFIX)/share/doc
 
 # Build flags
 
-CFLAGS ?= -O3
+CFLAGS ?= -g -O3
 CFLAGS += -Wall
 CPPFLAGS += -MMD
 LDFLAGS ?= -O3
@@ -127,6 +127,11 @@ xwax.o:		CFLAGS += $(SDL_CFLAGS)
 xwax.o:		CPPFLAGS += $(DEVICE_CPPFLAGS)
 xwax.o:		CPPFLAGS += -DEXECDIR=\"$(EXECDIR)\" -DVERSION=\"$(VERSION)\"
 xwax.o:		.version
+
+# Client
+
+xwax-client:	xwax-client.o
+xwax-client: LDLIBS += $(LIBLO_LIBS)
 
 # Install to system
 

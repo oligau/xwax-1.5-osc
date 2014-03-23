@@ -31,6 +31,7 @@
 #include "realtime.h"
 #include "rig.h"
 #include "status.h"
+#include "osc.h"
 #include "track.h"
 
 #define RATE 44100

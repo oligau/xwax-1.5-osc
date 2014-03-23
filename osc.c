@@ -34,14 +34,18 @@
  *  $Id$
  */
 
+#define _GNU_SOURCE /* strdupa() */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "osc.h"
 #include "player.h"
 #include "deck.h"
 #include "track.h"
+#include "cues.h"
 #include "player.h"
 
 #include "lo/lo.h"
@@ -52,6 +56,7 @@ lo_server_thread st;
 lo_server_thread st_tcp;
 pthread_t thread_osc_updater;
 struct deck *osc_deck;
+struct library *osc_library;
 int osc_ndeck = 0;
 lo_address address[2];
 int osc_nconnection = 0;
@@ -188,24 +193,24 @@ int osc_send_scale(int scale)
     return 0;
 }
 
-int osc_start(struct deck *deck)
+int osc_start(struct deck *deck, struct library *library)
 {
     osc_deck = deck;
+    osc_library = library;
     
     /* start a new server on port 7770 */
     st = lo_server_thread_new("7770", error);
+    
+    lo_server_thread_add_method(st, "/xwax/load_track", "isss", load_track_handler, NULL);
 
-    /* add method that will match any path and args */
-    //lo_server_thread_add_method(st, NULL, NULL, generic_handler, NULL);
+    lo_server_thread_add_method(st, "/xwax/set_cue", "iif", set_cue_handler, NULL);
+
+    lo_server_thread_add_method(st, "/xwax/punch_cue", "ii", punch_cue_handler, NULL);    
+
     lo_server_thread_add_method(st, "/xwax/connect", "", connect_handler, NULL);
 
-
-    /* add method that will match the path /foo/bar, with two numbers, coerced
-     * to float and int */
     lo_server_thread_add_method(st, "/xwax/pitch", "if", pitch_handler, NULL);
-    
-    /* add method that will match the path /foo/bar, with two numbers, coerced
-     * to float and int */
+
     lo_server_thread_add_method(st, "/xwax/position", "if", position_handler, NULL);
     
     /* add method that will match the path /quit with no args */
@@ -261,6 +266,82 @@ int generic_handler(const char *path, const char *types, lo_arg ** argv,
     fflush(stdout);
 
     return 1;
+}
+
+int load_track_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i path:%s artist:%s title:%s\n", path, argv[0]->i, &argv[1]->s, &argv[2]->s, &argv[3]->s);
+    fflush(stdout);
+    
+    int d;
+    struct deck *de;
+    struct record *r;    
+    
+    d = argv[0]->i;
+    de = &osc_deck[d];
+
+    r = malloc(sizeof *r);
+    if (r == NULL) {
+        perror("malloc");
+        return -1;
+    }
+    
+    r->pathname = strdup(&argv[1]->s);
+    r->artist = strdup(&argv[2]->s);
+    r->title = strdup(&argv[3]->s);  
+
+    r = library_add(osc_library, r);
+    if (r == NULL) {
+        /* FIXME: memory leak, need to do record_clear(r) */
+        return -1;
+    }
+
+    deck_load(&osc_deck[d], r);
+
+
+    return 0;
+}
+
+int set_cue_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i cue:%i position:%f\n", path, argv[0]->i, argv[1]->i, argv[2]->f);
+    fflush(stdout);
+    
+    int d, q;
+    double pos;
+    struct deck *de;
+    
+    d = argv[0]->i;
+    q = argv[1]->i;
+    pos = argv[2]->f;
+    
+    de = &osc_deck[d];
+    
+    cues_set(&de->cues, q, pos);
+    
+}
+
+int punch_cue_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i cue:%i\n", path, argv[0]->i, argv[1]->i);
+    fflush(stdout);
+    
+    int d, q;
+    struct deck *de;
+    
+    d = argv[0]->i;
+    q = argv[1]->i;
+    
+    de = &osc_deck[d];
+    
+    deck_cue(de, q);
+    
 }
 
 int pitch_handler(const char *path, const char *types, lo_arg ** argv,
