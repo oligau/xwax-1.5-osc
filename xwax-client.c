@@ -102,6 +102,32 @@ int osc_send_set_cue(char *server, int d, int q, double pos)
     return 0;
 }
 
+int osc_send_position(char *server, int d, double pos)
+{
+    lo_address t = lo_address_new(server, "7770");
+    
+    if (lo_send(t, "/xwax/position", "if", d, pos) == -1) {
+        fprintf(stderr, "OSC error %d: %s\n", lo_address_errno(t),
+            lo_address_errstr(t));
+        return 1;
+    }
+    
+    return 0;
+}
+
+int osc_send_pitch(char *server, int d, double pitch)
+{
+    lo_address t = lo_address_new(server, "7770");
+    
+    if (lo_send(t, "/xwax/pitch", "if", d, pitch) == -1) {
+        fprintf(stderr, "OSC error %d: %s\n", lo_address_errno(t),
+            lo_address_errstr(t));
+        return 1;
+    }
+    
+    return 0;
+}
+
 int osc_send_punch_cue(char *server, int d, int q)
 {
     lo_address t = lo_address_new(server, "7770");
@@ -276,6 +302,37 @@ int main(int argc, char *argv[])
         server = argv[1];
         d = atoi(argv[3]);
         return osc_send_recue(server, d);        
+    }else if(strcmp(argv[2], "position") == 0) {
+        if (argc < 5) {
+            usage(stderr);
+            return 0;
+        }        
+        
+        int d;
+        double pos;
+        char *server;
+                
+        server = argv[1];
+        d = atoi(argv[3]);
+        pos = atof(argv[4]);
+        return osc_send_position(server, d, pos);        
+    }else if(strcmp(argv[2], "pitch") == 0) {
+        if (argc < 5) {
+            usage(stderr);
+            return 0;
+        }        
+        
+        int d;
+        double pitch;
+        char *server;
+                
+        server = argv[1];
+        d = atoi(argv[3]);
+        pitch = atof(argv[4]);
+        return osc_send_pitch(server, d, pitch);        
+    }else {
+        usage(stderr);
+        return 0;
     }
         
     return 0;

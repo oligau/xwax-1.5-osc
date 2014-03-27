@@ -398,7 +398,7 @@ int osc_send_status(lo_address a, int d)
                 de->record->artist,     // artist name (string)
                 de->record->title,      // track title (string)
                 (float) tr->length / (float) tr->rate,  // track length in seconds (float)
-                pl->position,           // player position in seconds (float)
+                player_get_elapsed(pl),           // player position in seconds (float)
                 pl->pitch,              // player pitch (float)
                 pl->timecode_control)    // timecode activated or not (int)
             == -1) {
@@ -470,7 +470,6 @@ int recue_handler(const char *path, const char *types, lo_arg ** argv,
     fflush(stdout);
     
     struct deck *de;
-    struct player *pl;
     de = &osc_deck[argv[0]->i];
     
     deck_recue(de);
