@@ -42,6 +42,8 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
 int set_cue_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);       
 int punch_cue_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data); 
+int get_status_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);    
 int pitch_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
@@ -60,6 +62,7 @@ int osc_send_pos(int d, const float pos, const float pitch);
 int osc_send_track_load(struct deck *de);
 int osc_send_ppm_block(struct track *tr);
 int osc_send_scale(int scale);
+int osc_send_status(lo_address a, int d);
 
 void osc_start_updater_thread();
 void osc_start_updater();

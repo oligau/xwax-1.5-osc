@@ -205,7 +205,9 @@ int osc_start(struct deck *deck, struct library *library)
 
     lo_server_thread_add_method(st, "/xwax/set_cue", "iif", set_cue_handler, NULL);
 
-    lo_server_thread_add_method(st, "/xwax/punch_cue", "ii", punch_cue_handler, NULL);    
+    lo_server_thread_add_method(st, "/xwax/punch_cue", "ii", punch_cue_handler, NULL);  
+
+    lo_server_thread_add_method(st, "/xwax/get_status", "i", get_status_handler, NULL);    
 
     lo_server_thread_add_method(st, "/xwax/connect", "", connect_handler, NULL);
 
@@ -342,6 +344,65 @@ int punch_cue_handler(const char *path, const char *types, lo_arg ** argv,
     
     deck_cue(de, q);
     
+}
+
+int get_status_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i\n", path, argv[0]->i);
+    fflush(stdout);
+    
+    int d = argv[0]->i;
+    
+    lo_address a = lo_message_get_source(data);
+    
+    char* url = lo_address_get_url(a);
+    
+    printf("%s\n", url);
+    
+    //url[strlen(url)-2] = 1;
+    
+    //printf("%s\n", url);
+    
+    osc_send_status(a, d);
+    
+}
+
+int osc_send_status(lo_address a, int d)
+{
+    struct deck *de;
+    struct player *pl;
+    struct track *tr;
+    de = &osc_deck[d];
+    pl = &de->player;
+    tr = pl->track;
+    
+    char *path;
+    if(tr->path)
+        path = tr->path;
+    else
+        path = "";
+    
+    if(tr) {
+        /* send a message to /xwax/status */
+        if (lo_send(a, "/xwax/status", "isssfffi",
+                de->ncontrol,           // deck number (int)
+                path,               // track path (string)
+                de->record->artist,     // artist name (string)
+                de->record->title,      // track title (string)
+                (float) tr->length / (float) tr->rate,  // track length in seconds (float)
+                pl->position,           // player position in seconds (float)
+                pl->pitch,              // player pitch (float)
+                pl->timecode_control)    // timecode activated or not (int)
+            == -1) {
+            printf("OSC error %d: %s\n", lo_address_errno(a),
+                   lo_address_errstr(a));
+        }
+        printf("osc_send_status: sent deck %i status to %s\n", d, lo_address_get_url(a));            
+    }
+    
+    return 0;    
 }
 
 int pitch_handler(const char *path, const char *types, lo_arg ** argv,

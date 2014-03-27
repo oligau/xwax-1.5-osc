@@ -1,5 +1,6 @@
 TAGS
 xwax
+xwax-client
 *.o
 *.d
 .config
