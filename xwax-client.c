@@ -115,6 +115,45 @@ int osc_send_punch_cue(char *server, int d, int q)
     return 0;
 }
 
+int osc_send_disconnect(char *server, int d)
+{
+    lo_address t = lo_address_new(server, "7770");
+    
+    if (lo_send(t, "/xwax/disconnect", "i", d) == -1) {
+        fprintf(stderr, "OSC disconnect error %d: %s\n", lo_address_errno(t),
+            lo_address_errstr(t));
+        return 1;
+    }
+    
+    return 0;
+}
+
+int osc_send_reconnect(char *server, int d)
+{
+    lo_address t = lo_address_new(server, "7770");
+    
+    if (lo_send(t, "/xwax/reconnect", "i", d) == -1) {
+        fprintf(stderr, "OSC reconnect error %d: %s\n", lo_address_errno(t),
+            lo_address_errstr(t));
+        return 1;
+    }
+    
+    return 0;
+}
+
+int osc_send_recue(char *server, int d)
+{
+    lo_address t = lo_address_new(server, "7770");
+    
+    if (lo_send(t, "/xwax/recue", "i", d) == -1) {
+        fprintf(stderr, "OSC recue error %d: %s\n", lo_address_errno(t),
+            lo_address_errstr(t));
+        return 1;
+    }
+    
+    return 0;
+}
+
 static void usage(FILE *fd)
 {
     fprintf(fd, "Usage: xwax-client <server> load_track <deck-number> "
@@ -123,6 +162,9 @@ static void usage(FILE *fd)
             "<cue-number> <position>\n"
             "xwax-client <server> punch_cue <deck-number> "
             "<cue-number>\n"
+            "xwax-client <server> recue <deck-number>\n"
+            "xwax-client <server> disconnect <deck-number>\n"
+            "xwax-client <server> reconnect <deck-number>\n"              
             "xwax-client <server> get_status <deck-number>\n");     
 }
 
@@ -197,9 +239,43 @@ int main(int argc, char *argv[])
         server = argv[1];
         d = atoi(argv[3]);
         
-        return osc_send_get_status(server, d)
-;        
+        return osc_send_get_status(server, d);        
+    }else if(strcmp(argv[2], "disconnect") == 0) {
+        if (argc < 4) {
+            usage(stderr);
+            return 0;
+        }        
         
+        int d;
+        char *server;
+                
+        server = argv[1];
+        d = atoi(argv[3]);
+        return osc_send_disconnect(server, d);        
+    }else if(strcmp(argv[2], "reconnect") == 0) {
+        if (argc < 4) {
+            usage(stderr);
+            return 0;
+        }        
+        
+        int d;
+        char *server;
+                
+        server = argv[1];
+        d = atoi(argv[3]);
+        return osc_send_reconnect(server, d);        
+    }else if(strcmp(argv[2], "recue") == 0) {
+        if (argc < 4) {
+            usage(stderr);
+            return 0;
+        }        
+        
+        int d;
+        char *server;
+                
+        server = argv[1];
+        d = atoi(argv[3]);
+        return osc_send_recue(server, d);        
     }
         
     return 0;

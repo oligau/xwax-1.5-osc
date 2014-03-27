@@ -47,6 +47,12 @@ int get_status_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);    
 int pitch_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
+int recue_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data); 
+int disconnect_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data); 
+int reconnect_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data);                 
 int connect_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);                
 int position_handler(const char *path, const char *types, lo_arg ** argv,

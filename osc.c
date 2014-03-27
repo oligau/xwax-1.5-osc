@@ -207,7 +207,13 @@ int osc_start(struct deck *deck, struct library *library)
 
     lo_server_thread_add_method(st, "/xwax/punch_cue", "ii", punch_cue_handler, NULL);  
 
-    lo_server_thread_add_method(st, "/xwax/get_status", "i", get_status_handler, NULL);    
+    lo_server_thread_add_method(st, "/xwax/get_status", "i", get_status_handler, NULL);
+    
+    lo_server_thread_add_method(st, "/xwax/recue", "i", recue_handler, NULL); 
+  
+    lo_server_thread_add_method(st, "/xwax/disconnect", "i", disconnect_handler, NULL);    
+    
+    lo_server_thread_add_method(st, "/xwax/reconnect", "i", reconnect_handler, NULL);    
 
     lo_server_thread_add_method(st, "/xwax/connect", "", connect_handler, NULL);
 
@@ -418,6 +424,56 @@ int pitch_handler(const char *path, const char *types, lo_arg ** argv,
     pl = &de->player;
     
     player_set_pitch(pl, argv[1]->f);
+
+    return 0;
+}
+
+int disconnect_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i\n", path, argv[0]->i);
+    fflush(stdout);
+    
+    struct deck *de;
+    struct player *pl;
+    de = &osc_deck[argv[0]->i];
+    pl = &de->player;
+    
+    (void)player_toggle_timecode_control(pl);
+
+    return 0;
+}
+
+int reconnect_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i\n", path, argv[0]->i);
+    fflush(stdout);
+    
+    struct deck *de;
+    struct player *pl;
+    de = &osc_deck[argv[0]->i];
+    pl = &de->player;
+    
+    (void)player_toggle_timecode_control(pl);
+
+    return 0;
+}
+
+int recue_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i\n", path, argv[0]->i);
+    fflush(stdout);
+    
+    struct deck *de;
+    struct player *pl;
+    de = &osc_deck[argv[0]->i];
+    
+    deck_recue(de);
 
     return 0;
 }
