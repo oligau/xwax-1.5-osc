@@ -167,8 +167,9 @@ tests/cues:	tests/cues.o cues.o
 
 tests/external:	tests/external.o external.o
 
-tests/library:	tests/library.o excrate.o external.o index.o library.o rig.o status.o thread.o track.o
+tests/library:	tests/library.o excrate.o external.o index.o library.o rig.o status.o thread.o osc.o player.o deck.o cues.o timecoder.o realtime.o device.o lut.o controller.o track.o
 tests/library:	LDFLAGS += -pthread
+tests/library:	LDFLAGS += $(LIBLO_LIBS)
 
 tests/midi:	tests/midi.o midi.o
 tests/midi:	LDLIBS += $(ALSA_LIBS)
@@ -179,10 +180,11 @@ tests/status:	tests/status.o status.o
 
 tests/timecoder:	tests/timecoder.o lut.o timecoder.o
 
-tests/track:	tests/track.o excrate.o external.o index.o library.o rig.o status.o thread.o track.o
+tests/track:	tests/track.o excrate.o external.o index.o library.o rig.o status.o thread.o osc.o player.o deck.o cues.o timecoder.o realtime.o device.o lut.o controller.o track.o
 tests/track:	LDFLAGS += -pthread
 tests/track:	LDLIBS += -lm
-
+tests/track:	LDFLAGS += $(LIBLO_LIBS)
+ 
 tests/ttf.o:	tests/ttf.c  # not needed except to workaround Make 3.81
 tests/ttf.o:	CFLAGS += $(SDL_CFLAGS)
 

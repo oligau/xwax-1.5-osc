@@ -7,6 +7,8 @@ xwax-client
 .version
 dist
 
+tests/observer
+tests/external
 tests/cues
 tests/library
 tests/midi
