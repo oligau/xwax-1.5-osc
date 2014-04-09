@@ -198,6 +198,10 @@ int osc_start(struct deck *deck, struct library *library)
     osc_deck = deck;
     osc_library = library;
     
+    address[0] = lo_address_new_from_url("osc.udp://0.0.0.0:7771/");
+    address[1] = lo_address_new_from_url("osc.udp://0.0.0.0:7771/");
+    
+    
     /* start a new server on port 7770 */
     st = lo_server_thread_new("7770", error);
     
@@ -485,19 +489,27 @@ int connect_handler(const char *path, const char *types, lo_arg ** argv,
     fflush(stdout);
     
     lo_address a = lo_message_get_source(data);
-    address[osc_nconnection%2] = lo_address_new_from_url(lo_address_get_url(a));
-    printf("OSC client %i address changed to:%s\n", osc_nconnection%2, lo_address_get_url(address[osc_nconnection%2]));
-    ++osc_nconnection;
-    if(osc_nclient < 2)
-        ++osc_nclient;
+    
+    if(strcmp(lo_address_get_url(address[0]), lo_address_get_url(a)) == 0 || 
+        strcmp(lo_address_get_url(address[1]), lo_address_get_url(a)) == 0) {
+        // already stored as a client
+    } else {
+        address[osc_nconnection%2] = lo_address_new_from_url(lo_address_get_url(a));
+        printf("OSC client %i address changed to:%s\n", osc_nconnection%2, lo_address_get_url(address[osc_nconnection%2]));
+        
+        
+        ++osc_nconnection;
+        if(osc_nclient < 2)
+            ++osc_nclient;
+    }
 
     struct deck *de;
     struct player *pl;
 
     fprintf(stderr, "osc_nclient %i osc_ndeck: %i\n", osc_nclient, osc_ndeck);
-    int i;
-    for(i = 0; i < osc_ndeck; ++i) {
-        de = &osc_deck[i];
+    int d;
+    for(d = 0; d < osc_ndeck; ++d) {
+        de = &osc_deck[d];
         pl = &de->player;
         osc_send_track_load(de);
         osc_send_ppm_block(pl->track);

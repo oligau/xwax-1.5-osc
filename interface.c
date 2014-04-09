@@ -1480,8 +1480,8 @@ static bool handle_key(SDLKey key, SDLMod mod)
             case FUNC_LOAD:
                 re = selector_current(sel);
                 if (re != NULL) {
-                    deck_load(de, re);
                     osc_send_track_load(de);
+                    deck_load(de, re);
                 }
                 break;
 
