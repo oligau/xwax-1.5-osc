@@ -609,7 +609,7 @@ static void draw_bpm_field(SDL_Surface *surface, const struct rect *rect,
  */
 
 static void draw_record(SDL_Surface *surface, const struct rect *rect,
-                        const struct record *record)
+                        const struct record *record, struct player *pl)
 {
     struct rect artist, title, left, right;
 
@@ -621,7 +621,7 @@ static void draw_record(SDL_Surface *surface, const struct rect *rect,
 
     if (show_bpm(record->bpm)) {
         split(title, from_left(BPM_WIDTH, 0), &left, &right);
-        draw_bpm(surface, &left, record->bpm, background_col);
+        draw_bpm(surface, &left, record->bpm * pl->pitch, background_col);
 
         split(right, from_left(HALF_SPACER, 0), &left, &title);
         draw_rect(surface, &left, background_col);
@@ -1039,7 +1039,7 @@ static void draw_deck(SDL_Surface *surface, const struct rect *rect,
     if (rest.h < 160)
         rest = *rect;
     else
-        draw_record(surface, &track, deck->record);
+        draw_record(surface, &track, deck->record, pl);
 
     split(rest, from_top(CLOCK_FONT_SIZE * 2, SPACER), &top, &lower);
     if (lower.h < 64)
