@@ -443,9 +443,7 @@ int disconnect_handler(const char *path, const char *types, lo_arg ** argv,
     struct player *pl;
     de = &osc_deck[argv[0]->i];
     pl = &de->player;
-    
-    (void)player_toggle_timecode_control(pl);
-
+    pl->timecode_control = false;
     return 0;
 }
 
@@ -460,9 +458,7 @@ int reconnect_handler(const char *path, const char *types, lo_arg ** argv,
     struct player *pl;
     de = &osc_deck[argv[0]->i];
     pl = &de->player;
-    
-    (void)player_toggle_timecode_control(pl);
-
+    pl->timecode_control = true;
     return 0;
 }
 
